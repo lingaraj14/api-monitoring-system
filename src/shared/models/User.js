@@ -97,7 +97,7 @@ const userSchema = new mongoose.Schema({
 })
 
 // Hash password before saving
-userSchema.pre('save', async function (next) {
+/* userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }
@@ -109,6 +109,15 @@ userSchema.pre('save', async function (next) {
     } catch (error) {
         next(error);
     }
+}); */
+
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) {
+        return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Indexes for efficient querying
